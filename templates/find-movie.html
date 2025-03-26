@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #fefefd;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: row;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            flex-direction: row;
+        }
+
+        /* Left Content */
+        .left-content {
+            width: 50%;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main {
+            max-width: 600px;
+        }
+
+        .heading-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .heading {
+            font-size: 5rem;
+            font-weight: 650;
+            text-shadow: 0px 0px 10px rgba(128, 128, 128, 0.5);
+        }
+
+        .heading.accent {
+            color: #bad0f7;
+            margin-left: 10px;
+        }
+
+        .tagline {
+            font-size: 1.4rem;
+            font-weight: 500;
+            text-shadow: 0px 0px 10px rgba(128, 128, 128, 0.5);
+            margin: 20px 0 40px 0;
+            line-height: 1.6;
+        }
+
+        /* Form Elements */
+        .date-inputs {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .date-input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .date-input-container label {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background-color: #000;
+            padding: 0 8px;
+            font-size: 0.9rem;
+            color: #bad0f7;
+            border-radius: 4px;
+        }
+
+        .date-inputs input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: 2px solid #375282;
+            background-color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            transition: all 0.3s ease;
+            color: #000;
+        }
+
+        .date-inputs input:focus {
+            outline: none;
+            border-color: #bad0f7;
+            box-shadow: 0 0 10px rgba(186, 208, 247, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .recommend-button {
+            width: 100%;
+            padding: 18px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            border: none;
+            background-color: #375282;
+            color: white;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .recommend-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s;
+            z-index: -1;
+        }
+
+        .recommend-button:hover {
+            transform: scale(1.03) translateY(-5px);
+            box-shadow: 0 10px 20px rgba(55, 82, 130, 0.4), 0 0 15px rgba(154, 91, 255, 0.6);
+            background-color: #4a6ba8;
+        }
+
+        .recommend-button:hover:before {
+            left: 100%;
+        }
+
+        .recommend-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Right Content */
+        .right-content {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px;
+            max-width: 700px;
+        }
+
+        .card {
+            position: relative;
+            background-color: transparent;
+            color: #fefefd;
+            border-radius: 12px;
+            box-shadow: 0 0 10px #f1f1f1;
+            overflow: hidden;
+            height: 200px;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card:hover, .card.selected {
+            transform: scale(1.08) rotateY(5deg) translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(200, 255, 252, 0.8);
+            z-index: 2;
+        }
+
+        .card:hover .genre-image, .card.selected .genre-image {
+            transform: scale(1.1);
+        }
+
+        .card:hover .card-body, .card.selected .card-body {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding-bottom: 15px;
+        }
+
+        .genre-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            transition: all 0.5s ease;
+        }
+
+        .card-body {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Staggered layout */
+        .card:nth-child(even) {
+            margin-top: 50px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            body, .container {
+                flex-direction: column;
+            }
+            
+            .left-content, .right-content {
+                width: 100%;
+                padding: 20px;
+            }
+            
+            .heading {
+                font-size: 4rem;
+            }
+            
+            .cards-container {
+                margin-top: 30px;
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .card:nth-child(even) {
+                margin-top: 0;
+            }
+            
+            .heading {
+                font-size: 3rem;
+            }
+        }
+
+        #selected-genres {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <form action="/search" method="POST" class="container">
+        <!-- Left Side - Text Content -->
+        <div class="left-content">
+            <div class="main">
+                <div class="heading-container">
+                    <h1 class="heading">Movie</h1>
+                    <h1 class="heading accent">Verse</h1>
+                </div>
+                <p class="tagline">
+                    MovieVerse is your ultimate destination to explore, filter, and discover movies tailored
+                    to your taste-effortlessly find the perfect film for any mood, genre, or moment!
+                </p>
+                <div class="date-inputs">
+                    <div class="date-input-container">
+                        <label>Start Year</label>
+                        <input type="number" name="start_year" placeholder="e.g. 1990" required>
+                    </div>
+                    <div class="date-input-container">
+                        <label>End Year</label>
+                        <input type="number" name="end_year" placeholder="e.g. 2023" required>
+                    </div>
+                </div>
+                <button class="recommend-button" type="submit">
+                    Get Recommendation
+                </button>
+                <div id="selected-genres"></div>
+            </div>
+        </div>
+
+        <!-- Right Side - Cards -->
+        <div class="right-content">
+            <div class="cards-container">
+                <div class="card" onclick="toggleSelect(this, 'Action')">
+                    <img src="https://imgs.search.brave.com/Ku2OMumBYxBr_qDrHaxr56sxUXu4La63Ts0P3CQ9cFg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJzLmNvbS9p/bWFnZXMvZmVhdHVy/ZWQvYWN0aW9uLW1v/dmllLXBiOTNlN3Iz/NDNlcnFndHQuanBn" alt="Action" class="genre-image">
+                    <div class="card-body">Action</div>
+                </div>
+                <div class="card" onclick="toggleSelect(this, 'Comedy')">
+                    <img src="https://imgs.search.brave.com/jXXJoDs5kWndEJx9NRSfMIZ-mJdLvq-JCGzX8MyYH6M/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/ZXVyb3Bvc3RlcnMu/ZXUvaW1hZ2UvMzUw/L21ldGFsLXNpZ25z/L3B1bHAtZmljdGlv/bi1ibGFjay1hbmQt/d2hpdGUtZ3Vucy1p/MjEyODY3LmpwZw" alt="Comedy" class="genre-image">
+                    <div class="card-body">Comedy</div>
+                </div>
+                <div class="card" onclick="toggleSelect(this, 'Romance')">
+                    <img src="https://i.pinimg.com/736x/b4/64/ad/b464addbb072d3456b2f77a27105c4df.jpg" alt="Romance" class="genre-image">
+                    <div class="card-body">Romance</div>
+                </div>
+                <div class="card" onclick="toggleSelect(this, 'Thriller')">
+                    <img src="https://imgs.search.brave.com/wIJKWj9nLqeG90ye-LTTOcQSlJ6tCScNIta9BmNuC38/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJhY2Nlc3Mu/Y29tL2Z1bGwvMjA1/ODM4NC5qcGc" alt="Thriller" class="genre-image">
+                    <div class="card-body">Thriller</div>
+                </div>
+                <div class="card" onclick="toggleSelect(this, 'Rom-Com')">
+                    <img src="https://i.pinimg.com/736x/ec/d8/b8/ecd8b8b734be13da814f9acfad14a9f7.jpg" alt="Rom-Com" class="genre-image">
+                    <div class="card-body">Rom-Com</div>
+                </div>
+                <div class="card" onclick="toggleSelect(this, 'Sci-Fi')">
+                    <img src="https://i.pinimg.com/736x/77/76/cf/7776cf611bd758a2a4d3b2bd0a8a5b57.jpg" alt="Sci-Fi" class="genre-image">
+                    <div class="card-body">Sci-Fi</div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        let selectedGenres = [];
+
+        function toggleSelect(card, genre) {
+            card.classList.toggle('selected');
+            let index = selectedGenres.indexOf(genre);
+
+            if (index > -1) {
+                selectedGenres.splice(index, 1);
+            } else {
+                selectedGenres.push(genre);
+            }
+
+            updateHiddenInputs();
+        }
+
+        function updateHiddenInputs() {
+            let container = document.getElementById('selected-genres');
+            container.innerHTML = '';
+
+            selectedGenres.forEach((genre) => {
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'genre[]';
+                input.value = genre;
+                container.appendChild(input);
+            });
+        }
+    </script>
+</body>
+</html>
